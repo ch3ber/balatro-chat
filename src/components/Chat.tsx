@@ -59,13 +59,20 @@ export const Chat = () => {
   }
 
   return (
-    <div className="pb-32">
+    <div className="pb-44">
       <ul className="mt-20 flex flex-col gap-5">
         {messages.map((message) => (
-          <Message key={message.id} isBotMessage={message.isBotMessage} message={message.message} />
+          <Message
+            key={message.id}
+            isBotMessage={message.isBotMessage}
+            message={message.message}
+          />
         ))}
       </ul>
-      <Menu onSend={handleSend} isSending={isSending} />
+      <Menu
+        onSend={handleSend}
+        isSending={isSending}
+      />
     </div>
   )
 }
