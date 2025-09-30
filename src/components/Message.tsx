@@ -8,14 +8,14 @@ export const Message = ({ isBotMessage = false, message }: MessageProps) => {
 
   if (isBotMessage) {
     return (
-      <li className={`${baseClasses} self-end mr-10`}>
+      <li className={`${baseClasses} self-start ml-5`}>
         <p className="text-black whitespace-pre-wrap break-words">{message}</p>
       </li>
     )
   }
 
   return (
-    <li className={`${baseClasses} self-start ml-10`}>
+    <li className={`${baseClasses} self-end mr-5`}>
       <p className="text-black whitespace-pre-wrap break-words">{message}</p>
     </li>
   )
