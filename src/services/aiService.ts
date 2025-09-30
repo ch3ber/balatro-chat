@@ -1,24 +1,18 @@
+import OpenAI from 'openai'
 import type { IAiService } from './IAiService'
 
-interface OpenAIResponse {
-  output_text?: string
-  output?: Array<{
-    content?: Array<{
-      text?: {
-        value?: string
-      }
-    }>
-  }>
-}
-
 const DEFAULT_MODEL = 'gpt-4o-mini'
-const RESPONSES_ENDPOINT = 'https://api.openai.com/v1/responses'
 
 export class AIService implements IAiService {
   token: string
+  private client?: OpenAI
 
   constructor(token?: string) {
     this.token = token ?? ((import.meta.env?.PUBLIC_OPENAI_API_KEY as string | undefined) ?? '')
+
+    if (this.token) {
+      this.client = this.createClient(this.token)
+    }
   }
 
   async sendMessage(message: string): Promise<string> {
@@ -32,30 +26,17 @@ export class AIService implements IAiService {
       throw new Error('Missing OpenAI token.')
     }
 
-    const response = await fetch(RESPONSES_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${this.token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: DEFAULT_MODEL,
-        input: trimmedMessage,
-      }),
+    const client = this.getClient()
+    const response = await client.responses.create({
+      model: DEFAULT_MODEL,
+      input: trimmedMessage,
     })
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`OpenAI request failed: ${errorText || response.statusText}`)
+    if (typeof response.output_text === 'string' && response.output_text.trim().length > 0) {
+      return response.output_text.trim()
     }
 
-    const data = (await response.json()) as OpenAIResponse
-
-    if (typeof data.output_text === 'string' && data.output_text.trim().length > 0) {
-      return data.output_text.trim()
-    }
-
-    const fallbackText = data.output
+    const fallbackText = response.output
       ?.flatMap((item) =>
         item.content?.map((contentItem) => contentItem.text?.value ?? '') ?? []
       )
@@ -67,5 +48,20 @@ export class AIService implements IAiService {
     }
 
     throw new Error('Received an empty response from OpenAI.')
+  }
+
+  private createClient(apiKey: string) {
+    return new OpenAI({
+      apiKey,
+      dangerouslyAllowBrowser: true,
+    })
+  }
+
+  private getClient() {
+    if (!this.client) {
+      this.client = this.createClient(this.token)
+    }
+
+    return this.client
   }
 }
