@@ -1,11 +1,19 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import { Message } from '../components/Message'
+import { Menu } from '../components/Menu'
+import Layout from '../layouts/Layout.astro'
 ---
 
 <Layout>
-	<Welcome />
+  <header class="bg-white rounded-xl p-2.5 w-fit mx-auto mt-10 max-w-48 border-3 border-[#B9C2D2]">
+    <h1 class="text-black text-center w-fit">Balatreate con balatro chat. Only ludopatas</h1>
+  </header>
+  <ul class="mt-20 flex flex-col gap-5">
+    <Message
+      isBotMessage
+      message="joder tio ostras"
+    />
+    <Message message="que pasa" />
+  </ul>
+  <Menu />
 </Layout>
